@@ -64,3 +64,114 @@ body {
 #card-container.transitioning {
   opacity: 0;
 }
+
+/* ============================================================
+   CARD BASE
+   ============================================================ */
+.card {
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--card-radius);
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ============================================================
+   CARD FACE
+   ============================================================ */
+.card-face {
+  width: 100%;
+  height: 100%;
+  background: var(--color-card-face);
+  border-radius: var(--card-radius);
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  font-family: Georgia, serif;
+}
+
+.card.face-down .card-face {
+  display: none;
+}
+
+.card-corner {
+  position: absolute;
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: bold;
+  text-align: center;
+}
+
+.card-corner.top-left {
+  top: 4px;
+  left: 5px;
+}
+
+.card-corner.bottom-right {
+  bottom: 4px;
+  right: 5px;
+  transform: rotate(180deg);
+}
+
+.card-suit-center {
+  font-size: 28px;
+}
+
+.card.red .card-corner,
+.card.red .card-suit-center {
+  color: var(--color-red);
+}
+
+.card.black .card-corner,
+.card.black .card-suit-center {
+  color: var(--color-black);
+}
+
+/* ============================================================
+   CARD BACK
+   ============================================================ */
+.card-back {
+  width: 100%;
+  height: 100%;
+  background: var(--color-card-back);
+  border-radius: var(--card-radius);
+  border: 1px solid #0d2548;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.card.face-down .card-back {
+  display: flex;
+}
+
+.card-back::after {
+  content: '';
+  width: calc(var(--card-width) - 16px);
+  height: calc(var(--card-height) - 16px);
+  border: 2px solid var(--color-card-back-pattern);
+  border-radius: calc(var(--card-radius) - 2px);
+}
+
+/* ============================================================
+   CARD STATES
+   ============================================================ */
+.card:hover:not(.face-down) {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.card.selected .card-face {
+  outline: 3px solid var(--color-selected);
+  outline-offset: 1px;
+}
+
+.card.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
