@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Tests</title></head>
+<body>
+<script src="../app.js"></script>
+<script>
+  const deck = generateDeck();
+
+  console.assert(deck.length === 52, `Expected 52 cards, got ${deck.length}`);
+
+  const suits = [...new Set(deck.map(c => c.suit))];
+  console.assert(suits.length === 4, `Expected 4 suits, got ${suits.length}`);
+
+  const ranks = [...new Set(deck.map(c => c.rank))];
+  console.assert(ranks.length === 13, `Expected 13 ranks, got ${ranks.length}`);
+
+  const heartCard = deck.find(c => c.suit === '♥');
+  console.assert(heartCard.color === 'red', 'Hearts should be red');
+
+  const diamondCard = deck.find(c => c.suit === '♦');
+  console.assert(diamondCard.color === 'red', 'Diamonds should be red');
+
+  const spadeCard = deck.find(c => c.suit === '♠');
+  console.assert(spadeCard.color === 'black', 'Spades should be black');
+
+  const clubCard = deck.find(c => c.suit === '♣');
+  console.assert(clubCard.color === 'black', 'Clubs should be black');
+
+  const ids = deck.map(c => c.id);
+  console.assert(new Set(ids).size === 52, 'All 52 card IDs should be unique');
+
+  const testCard = { rank: 'A', suit: '♠', color: 'black', id: 'A♠' };
+  const el = createCardElement(testCard);
+  console.assert(el.tagName === 'DIV', 'createCardElement should return a div');
+  console.assert(el.classList.contains('card'), 'Element should have .card class');
+  console.assert(el.classList.contains('black'), 'Black card should have .black class');
+  console.assert(el.dataset.id === 'A♠', 'data-id should match card id');
+  console.assert(el.querySelector('.card-face') !== null, 'Should contain .card-face');
+  console.assert(el.querySelector('.card-back') !== null, 'Should contain .card-back');
+  console.assert(el.querySelector('.top-left') !== null, 'Should contain .top-left corner');
+  console.assert(el.querySelector('.card-suit-center') !== null, 'Should contain .card-suit-center');
+
+  console.log('All tests done — check above for failures');
+</script>
+</body>
+</html>
