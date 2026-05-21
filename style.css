@@ -175,3 +175,62 @@ body {
   opacity: 0.4;
   pointer-events: none;
 }
+
+/* ============================================================
+   PILE LAYOUT
+   ============================================================ */
+#card-container.pile {
+  width: var(--card-width);
+  height: var(--card-height);
+  cursor: pointer;
+}
+
+#card-container.pile .card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(
+    calc(var(--stack-index, 0) * var(--pile-offset)),
+    calc(var(--stack-index, 0) * calc(var(--pile-offset) * -1))
+  );
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+#card-container.pile .card:hover {
+  transform: translate(
+    calc(var(--stack-index, 0) * var(--pile-offset)),
+    calc(var(--stack-index, 0) * calc(var(--pile-offset) * -1))
+  );
+}
+
+/* ============================================================
+   GRID LAYOUT
+   ============================================================ */
+#card-container.grid {
+  display: grid;
+  grid-template-columns: repeat(13, var(--card-width));
+  gap: var(--card-gap);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1200px) {
+  :root {
+    --card-width: 60px;
+    --card-height: 84px;
+    --card-gap: 6px;
+  }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --card-width: 44px;
+    --card-height: 62px;
+    --card-gap: 4px;
+    --card-radius: 4px;
+  }
+
+  .card-corner { font-size: 9px; }
+  .card-suit-center { font-size: 20px; }
+}
