@@ -17,6 +17,36 @@ function generateDeck() {
 }
 
 // ============================================================
+// DECK OF CARDS API - https://deckofcardsapi.com/
+// ============================================================
+
+const API_BASE = 'https://deckofcardsapi.com/api/deck';
+
+function mapApiCard(c) {
+  const rankMap = { ACE: 'A', JACK: 'J', QUEEN: 'Q', KING: 'K' };
+  const suitMap = { HEARTS: '♥', DIAMONDS: '♦', CLUBS: '♣', SPADES: '♠' };
+  const rank = rankMap[c.value] ?? c.value;
+  const suit = suitMap[c.suit];
+  return { rank, suit, color: suit === '♥' || suit === '♦' ? 'red' : 'black', id: `${rank}${suit}`, image: c.image };
+}
+
+async function fetchDeck() {
+  const res = await fetch(`${API_BASE}/new/shuffle/?deck_count=1`);
+  const data = await res.json();
+  state.deckId = data.deck_id;
+}
+
+async function reshuffleDeck() {
+  await fetch(`${API_BASE}/${state.deckId}/shuffle/`);
+}
+
+async function drawCards(count) {
+  const res = await fetch(`${API_BASE}/${state.deckId}/draw/?count=${count}`);
+  const data = await res.json();
+  return data.cards.map(mapApiCard);
+}
+
+// ============================================================
 // RENDER
 // ============================================================
 
@@ -24,13 +54,12 @@ function createCardElement(card) {
   const el = document.createElement('div');
   el.className = `card ${card.color}`;
   el.dataset.id = card.id;
-  el.innerHTML =
-    `<div class="card-face">` +
-      `<span class="card-corner top-left">${card.rank}<br>${card.suit}</span>` +
+  const faceContent = card.image
+    ? `<img class="card-img" src="${card.image}" alt="${card.rank} of ${card.suit}">`
+    : `<span class="card-corner top-left">${card.rank}<br>${card.suit}</span>` +
       `<span class="card-suit-center">${card.suit}</span>` +
-      `<span class="card-corner bottom-right">${card.rank}<br>${card.suit}</span>` +
-    `</div>` +
-    `<div class="card-back"></div>`;
+      `<span class="card-corner bottom-right">${card.rank}<br>${card.suit}</span>`;
+  el.innerHTML = `<div class="card-face">${faceContent}</div><div class="card-back"></div>`;
   return el;
 }
 
@@ -64,6 +93,9 @@ function renderGrid(deck) {
 const state = {
   layout: 'pile',
   deck: [],
+  deckId: null,
+  loading: false,
+  error: null,
   game: {
     drawPile: [],
     currentCard: null,
@@ -77,19 +109,42 @@ function setLayout(name) {
   document.getElementById('table').dataset.layout = name;
 }
 
-function toggleLayout() {
+function showError(msg) {
+  state.error = msg;
+  const el = document.getElementById('error-message');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function clearError() {
+  state.error = null;
+  document.getElementById('error-message').classList.add('hidden');
+}
+
+async function toggleLayout() {
   const container = document.getElementById('card-container');
   container.classList.add('transitioning');
-  setTimeout(() => {
-    const next = state.layout === 'pile' ? 'grid' : 'pile';
-    setLayout(next);
-    if (state.layout === 'pile') {
-      renderPile(state.deck);
-    } else {
-      renderGrid(state.deck);
+  const next = state.layout === 'pile' ? 'grid' : 'pile';
+
+  if (next === 'grid') {
+    try {
+      await Promise.all([
+        reshuffleDeck().then(() => drawCards(52)).then(cards => { state.deck = cards; }),
+        new Promise(r => setTimeout(r, 350))
+      ]);
+    } catch (err) {
+      container.classList.remove('transitioning');
+      showError('Could not load cards from the API.');
+      return;
     }
-    container.classList.remove('transitioning');
-  }, 350);
+  } else {
+    await new Promise(r => setTimeout(r, 350));
+  }
+
+  setLayout(next);
+  if (next === 'pile') renderPile(state.deck);
+  else renderGrid(state.deck);
+  container.classList.remove('transitioning');
 }
 
 // ============================================================
@@ -100,15 +155,6 @@ const RANK_VALUES = { A: 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8':
 
 function rankValue(card) {
   return RANK_VALUES[card.rank];
-}
-
-function shuffleDeck(deck) {
-  const arr = [...deck];
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
 }
 
 function calcPoints(direction, currentCard, drawPile) {
@@ -155,41 +201,57 @@ function renderHiLo() {
     const buttons = document.createElement('div');
     buttons.className = 'hilow-buttons';
     buttons.innerHTML =
-      `<button class="hilow-btn" data-guess="higher">▲ Higher</button>` +
-      `<button class="hilow-btn" data-guess="lower">▼ Lower</button>`;
+      `<button class="hilow-btn" data-guess="higher" ${state.loading ? 'disabled' : ''}>▲ Higher</button>` +
+      `<button class="hilow-btn" data-guess="lower" ${state.loading ? 'disabled' : ''}>▼ Lower</button>`;
     ui.appendChild(buttons);
   }
 
   container.appendChild(ui);
 }
 
-function startGame() {
-  const shuffled = shuffleDeck(state.deck);
-  state.game.drawPile = shuffled;
-  state.game.currentCard = state.game.drawPile.pop();
-  state.game.score = 0;
-  state.game.over = false;
-  setLayout('hilow');
-  renderHiLo();
+async function startGame() {
+  clearError();
+  try {
+    await reshuffleDeck();
+    const [firstCard] = await drawCards(1);
+    state.game.currentCard = firstCard;
+    state.game.drawPile = generateDeck().filter(c => c.id !== firstCard.id);
+    state.game.score = 0;
+    state.game.over = false;
+    setLayout('hilow');
+    renderHiLo();
+  } catch (err) {
+    showError('Could not connect to the card API. Please try again.');
+  }
 }
 
-function makeGuess(direction) {
-  if (state.game.over) return;
-  const points = calcPoints(direction, state.game.currentCard, state.game.drawPile);
-  const nextCard = state.game.drawPile.pop();
-  const cv = rankValue(state.game.currentCard);
-  const nv = rankValue(nextCard);
-  const correct = direction === 'higher' ? nv > cv : nv < cv;
-
-  if (!correct) {
-    state.game.over = true;
-    state.game.currentCard = nextCard;
-  } else {
-    state.game.score += points;
-    state.game.currentCard = nextCard;
-    if (state.game.drawPile.length === 0) state.game.over = 'win';
-  }
+async function makeGuess(direction) {
+  if (state.game.over || state.loading) return;
+  state.loading = true;
   renderHiLo();
+
+  try {
+    const points = calcPoints(direction, state.game.currentCard, state.game.drawPile);
+    const [nextCard] = await drawCards(1);
+    state.game.drawPile = state.game.drawPile.filter(c => c.id !== nextCard.id);
+
+    const correct = direction === 'higher'
+      ? rankValue(nextCard) > rankValue(state.game.currentCard)
+      : rankValue(nextCard) < rankValue(state.game.currentCard);
+
+    if (!correct) {
+      state.game.over = true;
+    } else {
+      state.game.score += points;
+      if (state.game.drawPile.length === 0) state.game.over = 'win';
+    }
+    state.game.currentCard = nextCard;
+  } catch (err) {
+    showError('Could not draw card from API. Please try again.');
+  } finally {
+    state.loading = false;
+    renderHiLo();
+  }
 }
 
 // ============================================================
@@ -231,12 +293,17 @@ function sayName(){
 // INIT
 // ============================================================
 
-function init() {
+async function init() {
   state.deck = generateDeck();
   sayName();
   renderPile(state.deck);
   setLayout('pile');
   bindEvents();
+  try {
+    await fetchDeck();
+  } catch (err) {
+    showError('Could not connect to the card API. Some features may be unavailable.');
+  }
 }
 
 if (document.getElementById('table')) {

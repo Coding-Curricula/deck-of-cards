@@ -304,6 +304,38 @@ body {
 .hilow-result.win  { color: #2ecc71; }
 
 /* ============================================================
+   CARD IMAGE (API)
+   ============================================================ */
+.card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ============================================================
+   ERROR MESSAGE
+   ============================================================ */
+.error-message {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #c0392b;
+  color: white;
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-family: Georgia, serif;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.error-message.hidden {
+  display: none;
+}
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1200px) {
