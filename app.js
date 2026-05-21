@@ -56,3 +56,26 @@ function renderGrid(deck) {
     container.appendChild(el);
   });
 }
+
+// ============================================================
+// STATE
+// ============================================================
+
+const state = {
+  layout: 'pile',
+  deck: []
+};
+
+function toggleLayout() {
+  const container = document.getElementById('card-container');
+  container.classList.add('transitioning');
+  setTimeout(() => {
+    state.layout = state.layout === 'pile' ? 'grid' : 'pile';
+    if (state.layout === 'pile') {
+      renderPile(state.deck);
+    } else {
+      renderGrid(state.deck);
+    }
+    container.classList.remove('transitioning');
+  }, 350);
+}
