@@ -40,6 +40,31 @@
   console.assert(el.querySelector('.top-left') !== null, 'Should contain .top-left corner');
   console.assert(el.querySelector('.card-suit-center') !== null, 'Should contain .card-suit-center');
 
+  // rankValue
+  console.assert(rankValue({ rank: 'A' }) === 1, 'A should be 1');
+  console.assert(rankValue({ rank: '5' }) === 5, '5 should be 5');
+  console.assert(rankValue({ rank: '10' }) === 10, '10 should be 10');
+  console.assert(rankValue({ rank: 'J' }) === 11, 'J should be 11');
+  console.assert(rankValue({ rank: 'Q' }) === 12, 'Q should be 12');
+  console.assert(rankValue({ rank: 'K' }) === 13, 'K should be 13');
+
+  // shuffleDeck
+  const shuffled = shuffleDeck(deck);
+  console.assert(shuffled.length === 52, 'Shuffled deck should have 52 cards');
+  console.assert(shuffled !== deck, 'shuffleDeck should return a new array');
+  const shuffledIds = new Set(shuffled.map(c => c.id));
+  console.assert(shuffledIds.size === 52, 'Shuffled deck should contain all 52 unique cards');
+
+  // calcPoints — harder guesses score more points
+  const fullPile = generateDeck();
+  const easyPoints  = calcPoints('higher', { rank: '2', suit: '♠', color: 'black', id: '2♠' }, fullPile);
+  const hardPoints  = calcPoints('higher', { rank: 'Q', suit: '♠', color: 'black', id: 'Q♠' }, fullPile);
+  console.assert(hardPoints > easyPoints, `Harder guess (Q→higher) should score more than easy guess (2→higher): ${hardPoints} vs ${easyPoints}`);
+
+  const easyLowPoints = calcPoints('lower', { rank: 'K', suit: '♠', color: 'black', id: 'K♠' }, fullPile);
+  const hardLowPoints = calcPoints('lower', { rank: '3', suit: '♠', color: 'black', id: '3♠' }, fullPile);
+  console.assert(hardLowPoints > easyLowPoints, `Harder guess (3→lower) should score more than easy guess (K→lower): ${hardLowPoints} vs ${easyLowPoints}`);
+
   console.log('All tests done — check above for failures');
 </script>
 </body>

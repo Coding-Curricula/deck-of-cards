@@ -213,6 +213,97 @@ body {
 }
 
 /* ============================================================
+   HI-LO GAME
+   ============================================================ */
+#table {
+  position: relative;
+}
+
+.hilow-start-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #2980b9;
+  color: white;
+  display: none;
+  transition: background 0.15s, transform 0.1s;
+  z-index: 10;
+}
+
+.hilow-start-btn:hover {
+  background: #3498db;
+  transform: translateY(-2px);
+}
+
+#table[data-layout="pile"] .hilow-start-btn {
+  display: block;
+}
+
+#card-container.hilow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hilow-ui {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.hilow-score {
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  font-family: Georgia, serif;
+}
+
+.hilow-cards-left {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.hilow-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.hilow-btn {
+  padding: 12px 28px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #f39c12;
+  color: #1a1a1a;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.hilow-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.hilow-result {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 2;
+  font-family: Georgia, serif;
+}
+
+.hilow-result.lose { color: #e74c3c; }
+.hilow-result.win  { color: #2ecc71; }
+
+/* ============================================================
    RESPONSIVE
    ============================================================ */
 @media (max-width: 1200px) {
