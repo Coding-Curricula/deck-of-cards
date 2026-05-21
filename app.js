@@ -306,6 +306,7 @@ async function init() {
   bindEvents();
   try {
     await fetchDeck();
+    console.log("winning")
   } catch (err) {
     showError('Could not connect to the card API. Some features may be unavailable.');
   }
