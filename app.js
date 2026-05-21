@@ -15,3 +15,44 @@ function generateDeck() {
     }))
   );
 }
+
+// ============================================================
+// RENDER
+// ============================================================
+
+function createCardElement(card) {
+  const el = document.createElement('div');
+  el.className = `card ${card.color}`;
+  el.dataset.id = card.id;
+  el.innerHTML =
+    `<div class="card-face">` +
+      `<span class="card-corner top-left">${card.rank}<br>${card.suit}</span>` +
+      `<span class="card-suit-center">${card.suit}</span>` +
+      `<span class="card-corner bottom-right">${card.rank}<br>${card.suit}</span>` +
+    `</div>` +
+    `<div class="card-back"></div>`;
+  return el;
+}
+
+function renderPile(deck) {
+  const container = document.getElementById('card-container');
+  container.className = 'pile';
+  container.innerHTML = '';
+  deck.forEach((card, i) => {
+    const el = createCardElement(card);
+    el.classList.add('face-down');
+    el.style.setProperty('--stack-index', i);
+    container.appendChild(el);
+  });
+}
+
+function renderGrid(deck) {
+  const container = document.getElementById('card-container');
+  container.className = 'grid';
+  container.innerHTML = '';
+  deck.forEach(card => {
+    const el = createCardElement(card);
+    el.classList.add('face-up');
+    container.appendChild(el);
+  });
+}
