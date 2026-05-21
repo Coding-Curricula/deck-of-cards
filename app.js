@@ -79,3 +79,28 @@ function toggleLayout() {
     container.classList.remove('transitioning');
   }, 350);
 }
+
+// ============================================================
+// EVENTS
+// ============================================================
+
+function bindEvents() {
+  const table = document.getElementById('table');
+  const container = document.getElementById('card-container');
+
+  container.addEventListener('dblclick', e => {
+    e.stopPropagation();
+    if (state.layout === 'pile') toggleLayout();
+  });
+
+  table.addEventListener('dblclick', () => {
+    if (state.layout === 'grid') toggleLayout();
+  });
+
+  table.addEventListener('click', e => {
+    const card = e.target.closest('.card');
+    if (card && state.layout === 'grid') {
+      card.classList.toggle('selected');
+    }
+  });
+}
