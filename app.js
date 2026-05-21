@@ -223,12 +223,17 @@ function bindEvents() {
   document.getElementById('hilow-start').addEventListener('click', startGame);
 }
 
+function sayName(){
+  console.log("My name is Card Game App!");
+}
+
 // ============================================================
 // INIT
 // ============================================================
 
 function init() {
   state.deck = generateDeck();
+  sayName();
   renderPile(state.deck);
   setLayout('pile');
   bindEvents();
