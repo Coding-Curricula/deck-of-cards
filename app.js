@@ -289,6 +289,10 @@ function sayName(){
   console.log("My name is Card Game App!");
 }
 
+function brandNewFeature(){
+  console.log("This is a brand new feature!");
+}
+
 // ============================================================
 // INIT
 // ============================================================
@@ -296,6 +300,7 @@ function sayName(){
 async function init() {
   state.deck = generateDeck();
   sayName();
+  brandNewFeature();
   renderPile(state.deck);
   setLayout('pile');
   bindEvents();
