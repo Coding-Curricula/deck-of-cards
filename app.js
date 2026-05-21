@@ -104,3 +104,17 @@ function bindEvents() {
     }
   });
 }
+
+// ============================================================
+// INIT
+// ============================================================
+
+function init() {
+  state.deck = generateDeck();
+  renderPile(state.deck);
+  bindEvents();
+}
+
+if (document.getElementById('table')) {
+  init();
+}
